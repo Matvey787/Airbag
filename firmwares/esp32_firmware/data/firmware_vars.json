@@ -1,0 +1,529 @@
+[
+  {
+  "GPS_LAT": {
+    "val": 0.0,
+    "units": "deg",
+    "field_name": "GPS Latitude",
+    "field_obj": "gps_lat",
+    "info": "Current latitude from GPS module"
+    }
+  },
+  {
+    "GPS_LON": {
+      "val": 0.0,
+      "units": "deg",
+      "field_name": "GPS Longitude",
+      "field_obj": "gps_lon",
+      "info": "Current longitude from GPS module"
+    }
+  },
+  {
+    "GPS_DAY": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Day",
+      "field_obj": "gps_day",
+      "info": "Day of month from GPS date"
+    }
+  },
+  {
+    "GPS_MONTH": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Month",
+      "field_obj": "gps_month",
+      "info": "Month from GPS date"
+    }
+  },
+  {
+    "GPS_YEAR": {
+      "val": 2026,
+      "units": "",
+      "field_name": "GPS Year",
+      "field_obj": "gps_year",
+      "info": "Year from GPS date"
+    }
+  },
+  {
+    "GPS_HOUR": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Hour",
+      "field_obj": "gps_hour",
+      "info": "Hour (UTC) from GPS time"
+    }
+  },
+  {
+    "GPS_MIN": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Minute",
+      "field_obj": "gps_min",
+      "info": "Minute from GPS time"
+    }
+  },
+  {
+    "GPS_SEC": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Second",
+      "field_obj": "gps_sec",
+      "info": "Second from GPS time"
+    }
+  },
+  {
+    "GPS_SAT": {
+      "val": 0,
+      "units": "",
+      "field_name": "GPS Satellites",
+      "field_obj": "gps_sat",
+      "info": "Number of satellites in use"
+    }
+  },
+  {
+    "GPS_SPD": {
+      "val": 0.0,
+      "units": "km/h",
+      "field_name": "GPS Speed",
+      "field_obj": "gps_spd",
+      "info": "Ground speed from GPS"
+    }
+  },
+  {
+    "CH_ARM": {
+      "val": 4,
+      "units": "",
+      "field_name": "",
+      "field_obj": "spinBox_arm_channel",
+      "info": ""
+    }
+  },
+  {
+    "CH_HH": {
+      "val": 8,
+      "units": "",
+      "field_name": "",
+      "field_obj": "spinBox_hh_channel",
+      "info": ""
+    }
+  },
+  {
+    "CH_MAIN_ENGINE": {
+      "val": 10,
+      "units": "",
+      "field_name": "",
+      "field_obj": "spinBox_me_channel",
+      "info": ""
+    }
+  },
+  {
+    "CH_FORWARD": {
+      "val": 2,
+      "units": "",
+      "field_name": "",
+      "field_obj": "spinBox_le_channel",
+      "info": ""
+    }
+  },
+  {
+    "CH_ROTATE": {
+      "val": 0,
+      "units": "",
+      "field_name": "",
+      "field_obj": "spinBox_rle_channel",
+      "info": ""
+    }
+  },
+  {
+    "CH_HH_VAL": {
+      "val": 172,
+      "units": "",
+      "field_name": "Heading Hold Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_HH_MIN": {
+      "val": 900,
+      "units": "",
+      "field_name": "Headin Hold Min Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_HH_MAX": {
+      "val": 1100,
+      "units": "",
+      "field_name": "Heading Hold Max Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ARM_VAL": {
+      "val": 172,
+      "units": "",
+      "field_name": "ARM Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ARM_MIN": {
+      "val": 1500,
+      "units": "",
+      "field_name": "ARM Min Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ARM_MAX": {
+      "val": 2000,
+      "units": "",
+      "field_name": "ARM Max Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ROTATE_VAL": {
+      "val": 172,
+      "units": "",
+      "field_name": "Rotate Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ROTATE_MIN": {
+      "val": 172,
+      "units": "",
+      "field_name": "Rotate Min Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_ROTATE_MAX": {
+      "val": 1800,
+      "units": "",
+      "field_name": "Rotate Max Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_FORWARD_VAL": {
+      "val": 172,
+      "units": "",
+      "field_name": "Forward Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_FORWARD_MIN": {
+      "val": 172,
+      "units": "",
+      "field_name": "Forward Min Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_FORWARD_MAX": {
+      "val": 1800,
+      "units": "",
+      "field_name": "Forward Max Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_MAIN_ENGINE_VAL": {
+      "val": 172,
+      "units": "",
+      "field_name": "Main Engine Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_MAIN_ENGINE_MIN": {
+      "val": 172,
+      "units": "",
+      "field_name": "Main Engine Min Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "CH_MAIN_ENGINE_MAX": {
+      "val": 1100,
+      "units": "",
+      "field_name": "Main Engine Max Channel Value",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "PITCH": {
+      "val": 0.0,
+      "units": "deg",
+      "field_name": "Pitch",
+      "field_obj": "pitch",
+      "info": "Responsible for rotation around the Y‑axis. (blue arrow)"
+    }
+  },
+  {
+    "ROLL": {
+      "val": 0,
+      "units": "deg",
+      "field_name": "Roll",
+      "field_obj": "roll",
+      "info": "Responsible for rotation around the X‑axis. (red arrow)"
+    }
+  },
+  {
+    "YAW": {
+      "val": 0,
+      "units": "deg",
+      "field_name": "Yaw",
+      "field_obj": "yaw",
+      "info": "Responsible for rotation around the Z‑axis. (green arrow)"
+    }
+  },
+  {
+    "TEMP_FRONT": {
+      "val": 0,
+      "units": "℃",
+      "field_name": "Front Bay Temperature",
+      "field_obj": "front_temperature",
+      "info": ""
+    }
+  },
+  {
+    "TEMP_REAR": {
+      "val": 0,
+      "units": "℃",
+      "field_name": "Rear Bay Temperature",
+      "field_obj": "rear_temperature",
+      "info": ""
+    }
+  },
+  {
+    "HUM_FRONT": {
+      "val": 0,
+      "units": "%",
+      "field_name": "Front Bay Humidity",
+      "field_obj": "front_humidity",
+      "info": ""
+    }
+  },
+  {
+    "HUM_REAR": {
+      "val": 0,
+      "units": "%",
+      "field_name": "Rear Bay Humidity",
+      "field_obj": "rear_humidity",
+      "info": ""
+    }
+  },
+  {
+    "ANG_VEL_X": {
+      "val": 0,
+      "units": "deg/s",
+      "field_name": "Angular Velocity X",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "ANG_VEL_Y": {
+      "val": 0,
+      "units": "deg/s",
+      "field_name": "Angular Velocity Y",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "ANG_VEL_Z": {
+      "val": 0,
+      "units": "deg/s",
+      "field_name": "Angular Velocity Z",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "ACCEL_X": {
+      "val": 0,
+      "units": "m/s^2",
+      "field_name": "Acceleration X",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "ACCEL_Y": {
+      "val": 0,
+      "units": "m/s^2",
+      "field_name": "Acceleration Y",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+    "ACCEL_Z": {
+      "val": 0,
+      "units": "m/s^2",
+      "field_name": "Acceleration Z",
+      "field_obj": "",
+      "info": ""
+    }
+  },
+  {
+  "PWM_LE": {
+      "val": 1000,
+      "units": "ms",
+      "field_name": "PWM Left Engine",
+      "field_obj": "spinBox_re_pwm",
+      "info": ""
+    }
+  },
+  {
+  "PWM_RE": {
+      "val": 1000,
+      "units": "ms",
+      "field_name": "PWM Right Engine",
+      "field_obj": "spinBox_le_pwm",
+      "info": ""
+    }
+  },
+  {
+  "PWM_ME": {
+      "val": 1500,
+      "units": "ms",
+      "field_name": "PWM Main Engine",
+      "field_obj": "spinBox_me_pwm",
+      "info": ""
+    }
+  },
+  {
+    "MAG_MAX_REJECT_STREAK": {
+      "val": 5,
+      "units": " ",
+      "field_name": "Mag Max Reject Streak",
+      "field_obj": "mag_max_reject_streak",
+      "info": "The number of cycles after which the current direction will already be considered a new goal, no matter what."
+    }
+  },
+  {
+    "MAG_SPIKE_THRESHOLD": {
+      "val": 45.0,
+      "units": "deg",
+      "field_name": "Mag Spike Threashold",
+      "field_obj": "mag_spike_threashold",
+      "info": "Maximum allowable heading change (deg) per single read cycle"
+    }
+  },
+  {
+    "MAG_DT_MAX": {
+      "val": 0.1,
+      "units": "s",
+      "field_name": "Mag Max dt",
+      "field_obj": "mag_max_dt",
+      "info": "Maximum time window (sec) for spike detection; if dt exceeds this value, any heading change is accepted as valid."
+    }
+  },
+  {
+    "PID_INTEGRAL_LIMIT": {
+      "val": 200,
+      "units": "mcs",
+      "field_name": "Max Integral PWM",
+      "field_obj": "pid_max_integral_pwm",
+      "info": "The maximum absolute value of the integral correction."
+    }
+  },
+  {
+    "PID_MAX_OUTPUT": {
+      "val": 1000,
+      "units": "mcs",
+      "field_name": "Max PID PWM",
+      "field_obj": "pid_max_PID_pwm",
+      "info": "The maximum absolute value of the PID (Proportional + Integral + Differential) correction."
+    }
+  },
+  {
+    "PID_MAX_STEP_PER_LOOP": {
+      "val": 15,
+      "units": "mcs",
+      "field_name": "Max PID PWM Delta",
+      "field_obj": "pidmax_PID_pwm_delta",
+      "info": "The maximum correction value to the previous PID value per cycle."
+    }
+  },
+  {
+    "PID_P": {
+      "val": 0.8,
+      "units": " ",
+      "field_name": "Proportional",
+      "field_obj": "pid_proportional",
+      "info": "Determines the immediate reaction to the current angular rate error. Higher values increase system stiffness and responsiveness but may cause high-frequency oscillations or motor heating if set too high."
+    },
+    "PID_I": {
+      "val": 0.03,
+      "units": " ",
+      "field_name": "Integral",
+      "field_obj": "pid_integral",
+      "info": "Accumulates past errors to eliminate steady-state offset (drift). Essential for maintaining exact heading against constant disturbances like wind or mechanical imbalance. Excessive values lead to slow 'wind-up' and sluggish recovery after large maneuvers. More I = better at remembering to correct long-term drift, but it can make the system feel \"heavy\" or slow to react if overdone."
+    },
+    "PID_D": {
+      "val": 0.05,
+      "units": " ",
+      "field_name": "Differential",
+      "field_obj": "pid_differential",
+      "info": "Predicts future error based on the rate of change of the gyro signal. Acts as a damper to suppress overshoot and smooth out rapid stick inputs. More D = smoother stops and less bouncing, but it makes the motors work harder against tiny sensor vibrations."
+    }
+  },
+  {
+    "HH_MAG_CORRECTION_GAIN": {
+      "val": 0.08,
+      "units": " ",
+      "field_name": "Mag Correction Weight",
+      "field_obj": "mag_correction_weight",
+      "info": "The force with which the airbag responds to compass readings while  hold the course."
+    }
+  },
+  {
+    "HH_ROT_WEIGHT_GYRO": {
+      "val": 0.8,
+      "units": " ",
+      "field_name": "Gyro Correction Weight",
+      "field_obj": "gyro_correction_weight",
+      "info": "The weight of the gyroscope in detecting a turn ( <= 1). It allows for taking into account not only how long the user held the steering stick but also the actual gyroscope readings."
+    }
+  },
+  {
+    "HH_MAX_MAG_RATE": {
+      "val": 15.0,
+      "units": "deg/s",
+      "field_name": "Mag Angular Velocity",
+      "field_obj": "mag_angular_velocity",
+      "info": "Maximum angular velocity correction from the magnetometer (absolute terms)"
+    }
+  },
+  {
+    "HH_STICK_RATE_SCALE": {
+      "val": 90.0,
+      "units": "deg/s",
+      "field_name": "Stick Angular Velocity",
+      "field_obj": "stick_angular_velocity",
+      "info": "Maximum angular velocity correction from the stick (absolute terms)"
+    }
+  }
+]
