@@ -640,6 +640,11 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 	ui->setupUi(this);
 
+	ui->gridLayout_graphs->setRowStretch(0, 1);
+	ui->gridLayout_graphs->setRowStretch(1, 1);
+	ui->gridLayout_graphs->setColumnStretch(0, 1);
+	ui->gridLayout_graphs->setColumnStretch(1, 1);
+
 	qDebug() << "scrollArea viewport size:"
 			 << ui->rangeSliders_scrollArea->viewport()->size();
 	qDebug() << "scrollAreaWidgetContents size:"

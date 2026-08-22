@@ -79,186 +79,46 @@ QTabBar::tab:selected {
        <attribute name="title">
         <string>Graphs</string>
        </attribute>
-       <widget class="QWidget" name="pwmChartContainer" native="true">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>30</y>
-          <width>360</width>
-          <height>210</height>
-         </rect>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LayoutDirection::LeftToRight</enum>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-padding: 0px;
-margin: 0px;
-border: none;</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="accelerationChartContainer" native="true">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>280</y>
-          <width>360</width>
-          <height>210</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-padding: 0px;
-margin: 0px;
-border: none;</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="deltaPWMChartContainer" native="true">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>30</y>
-          <width>360</width>
-          <height>210</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-padding: 0px;
-margin: 0px;
-border: none;</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="angularVelocityChartContainer" native="true">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>280</y>
-          <width>360</width>
-          <height>210</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-padding: 0px;
-margin: 0px;
-border: none;</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_37">
-        <property name="geometry">
-         <rect>
-          <x>170</x>
-          <y>10</y>
-          <width>51</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Roboto</family>
-          <pointsize>14</pointsize>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
+       <layout class="QGridLayout" name="gridLayout_graphs">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_pwmCell">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_pwmHeader">
+            <item>
+             <widget class="QLabel" name="label_37">
+              <property name="font">
+               <font>
+                <family>Roboto</family>
+                <pointsize>14</pointsize>
+                <bold>true</bold>
+                <underline>true</underline>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background: transparent;
 color: orange;</string>
-        </property>
-        <property name="text">
-         <string>PWM</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_41">
-        <property name="geometry">
-         <rect>
-          <x>540</x>
-          <y>10</y>
-          <width>101</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Roboto</family>
-          <pointsize>14</pointsize>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-color: orange;</string>
-        </property>
-        <property name="text">
-         <string>PWM Delta</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_38">
-        <property name="geometry">
-         <rect>
-          <x>510</x>
-          <y>260</y>
-          <width>141</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Roboto</family>
-          <pointsize>14</pointsize>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-color: orange;</string>
-        </property>
-        <property name="text">
-         <string>Angular Velocity</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_45">
-        <property name="geometry">
-         <rect>
-          <x>140</x>
-          <y>260</y>
-          <width>111</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Roboto</family>
-          <pointsize>14</pointsize>
-          <bold>true</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;
-color: orange;</string>
-        </property>
-        <property name="text">
-         <string>Acceleration</string>
-        </property>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>376</x>
-          <y>9</y>
-          <width>141</width>
-          <height>89</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_10">
+              </property>
+              <property name="text">
+               <string>PWM</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_pwmHeader">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QWidget" name="layoutWidget">
+              <layout class="QVBoxLayout" name="verticalLayout_10">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_18">
            <item>
@@ -372,7 +232,152 @@ color: orange;</string>
           </layout>
          </item>
         </layout>
-       </widget>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QWidget" name="pwmChartContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+padding: 0px;
+margin: 0px;
+border: none;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_deltaPwmCell">
+          <item>
+           <widget class="QLabel" name="label_41">
+            <property name="font">
+             <font>
+              <family>Roboto</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+color: orange;</string>
+            </property>
+            <property name="text">
+             <string>PWM Delta</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="deltaPWMChartContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+padding: 0px;
+margin: 0px;
+border: none;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_accelerationCell">
+          <item>
+           <widget class="QLabel" name="label_45">
+            <property name="font">
+             <font>
+              <family>Roboto</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+color: orange;</string>
+            </property>
+            <property name="text">
+             <string>Acceleration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="accelerationChartContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+padding: 0px;
+margin: 0px;
+border: none;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_angularVelocityCell">
+          <item>
+           <widget class="QLabel" name="label_38">
+            <property name="font">
+             <font>
+              <family>Roboto</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+color: orange;</string>
+            </property>
+            <property name="text">
+             <string>Angular Velocity</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="angularVelocityChartContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background: transparent;
+padding: 0px;
+margin: 0px;
+border: none;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
