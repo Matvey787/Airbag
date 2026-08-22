@@ -116,6 +116,9 @@ private:
 		QWidget* container, const int min, const int max);
 	void setupRangeSliders();
 
+	QWidget* channelsOverlay = nullptr;
+	bool eventFilter(QObject* watched, QEvent* event) override;
+
 QWebEngineView* mapView = nullptr;
 QProcess *tileServer = nullptr;
 QProcess *mapServer = nullptr;

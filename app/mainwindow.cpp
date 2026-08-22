@@ -581,10 +581,12 @@ void MainWindow::setupRangeSliders()
 
 	ui->rangeSliders_scrollArea->setEnabled(ui->channels_checkBox->isChecked());
 
-	auto* overlay = new QWidget(ui->rangeSliders_scrollArea);
-	overlay->setStyleSheet("background-color: rgba(0, 0, 0, 150);");
-	overlay->setGeometry(ui->rangeSliders_scrollArea->rect());
-	overlay->raise();
+	channelsOverlay = new QWidget(ui->rangeSliders_scrollArea);
+	channelsOverlay->setStyleSheet("background-color: rgba(0, 0, 0, 150);");
+	channelsOverlay->setGeometry(ui->rangeSliders_scrollArea->rect());
+	channelsOverlay->setVisible(!ui->channels_checkBox->isChecked());
+	channelsOverlay->raise();
+	ui->rangeSliders_scrollArea->installEventFilter(this);
 
 	connect(ui->channels_checkBox,
 		&QCheckBox::toggled,
@@ -593,12 +595,23 @@ void MainWindow::setupRangeSliders()
 	connect(ui->channels_checkBox,
 		&QCheckBox::toggled,
 		this,
-		[this, overlay](bool checked)
+		[this](bool checked)
 		{
 			ui->rangeSliders_scrollArea->setEnabled(checked);
-			overlay->setVisible(!checked);
-			overlay->raise();
+			channelsOverlay->setVisible(!checked);
+			channelsOverlay->raise();
 		});
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == ui->rangeSliders_scrollArea
+		&& event->type() == QEvent::Resize && channelsOverlay)
+	{
+		channelsOverlay->setGeometry(ui->rangeSliders_scrollArea->rect());
+	}
+
+	return QMainWindow::eventFilter(watched, event);
 }
 QString MainWindow::getWifiInterfaceName()
 {
@@ -644,6 +657,15 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->gridLayout_graphs->setRowStretch(1, 1);
 	ui->gridLayout_graphs->setColumnStretch(0, 1);
 	ui->gridLayout_graphs->setColumnStretch(1, 1);
+
+	ui->horizontalLayout_gizmo->setStretch(0, 1);
+	ui->horizontalLayout_gizmo->setStretch(1, 0);
+
+	ui->verticalLayout_tempHumidity->setStretch(0, 1);
+	ui->verticalLayout_tempHumidity->setStretch(1, 1);
+
+	ui->horizontalLayout_gpsMap->setStretch(0, 1);
+	ui->horizontalLayout_gpsMap->setStretch(1, 0);
 
 	qDebug() << "scrollArea viewport size:"
 			 << ui->rangeSliders_scrollArea->viewport()->size();
