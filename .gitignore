@@ -4,3 +4,4 @@ Airbag
 app/map/central-fed-district-260818.mbtiles
 app/map/central-fed-district-260818.osm.pbf
 *.txt
+build/
