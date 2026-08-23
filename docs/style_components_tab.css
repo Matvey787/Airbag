@@ -1,0 +1,100 @@
+
+#components {
+    background-color: #0a0a0a;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.track {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 30%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.track-left {
+    left: 0;
+}
+
+.track-right {
+    right: 0;
+}
+
+.track-item {
+    position: absolute;
+    width: 70%;
+    opacity: 0;
+    filter:  grayscale(50%) brightness(0.3);
+}
+
+@keyframes floatLeft {
+    0% { transform: translateY(110vh) rotate(-45deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-20vh) rotate(45deg); opacity: 0; }
+}
+
+@keyframes floatRight {
+    0% { transform: translateY(110vh) rotate(45deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-20vh) rotate(-45deg); opacity: 0; }
+}
+
+.t-l-1 { left: 80%; animation: floatLeft 24s linear infinite; animation-delay: 0s; }
+.t-l-2 { left: 0%; animation: floatLeft 18s linear infinite; animation-delay: -2s;}
+.t-l-3 { left: 20%; animation: floatLeft 16s linear infinite; animation-delay: -4s; }
+.t-l-4 { left: 30%; animation: floatLeft 14s linear infinite; animation-delay: -6;}
+.t-l-5 { left: 60%; animation: floatLeft 12s linear infinite; animation-delay: -8s; }
+.t-l-6 { left: 20%; animation: floatLeft 16s linear infinite; animation-delay: -10s;}
+.t-l-7 { left: 10%; animation: floatLeft 24s linear infinite; animation-delay: -0s; }
+
+.t-r-2 { right: 0%; animation: floatRight 22s linear infinite; animation-delay: -2s; }
+.t-r-3 { right: 20%; animation: floatRight 20s linear infinite; animation-delay: -4s; }
+.t-r-4 { right: 30%; animation: floatRight 18s linear infinite; animation-delay: -6s;}
+.t-r-5 { right: 40%; animation: floatRight 16s linear infinite; animation-delay: -8s; }
+.t-r-6 { right: 50%; animation: floatRight 14s linear infinite; animation-delay: -10s; }
+.t-r-7 { right: 10%; animation: floatRight 12s linear infinite; animation-delay: -12s;}
+.t-r-8 { right: 80%; animation: floatRight 16s linear infinite; animation-delay: -14s; }
+
+#components ul {
+    list-style: none;
+    padding: 0;
+    margin: 40px 0;
+    max-width: 50%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+#components li {
+    position: relative;
+    padding-left: 25px;
+    font-size: 20px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+#components > ul > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid #ff8c00;
+}
