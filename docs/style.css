@@ -21,7 +21,7 @@ section {
 section p {
     font-size: 20px;
     line-height: 1.6;
-    max-width: 50%;
+    max-width: 100%;
     width: 50%;
     text-align: left;
     margin: 0 auto 20px auto;
@@ -32,6 +32,21 @@ section p {
     height: 300px;
     object-fit: contain;
     margin-bottom: 20px;
+	align-self: center;
+}
+
+.qr-container {
+    display: flex;          
+    justify-content: center;
+    align-items: center;    
+    gap: 30px;              
+    margin-top: 20px;       
+}
+
+.section-qr {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
 	align-self: center;
 }
 
@@ -46,7 +61,7 @@ h1 {
 p {
 	font-size: 20px;
 	line-height: 1.6;
-	max-width: 800px;
+	max-width: 100%;
 	text-align: center;
 	z-index: 1;
 }
@@ -106,7 +121,7 @@ nav ul {
     flex-direction: row; 
     align-items: center; 
     width: auto;
-    max-width: none;
+    max-width: 100%;
     margin: 0;
     padding: 0;
 }

@@ -4,7 +4,7 @@
 
 #firmware > ul {
     display: block;
-    max-width: 50%;
+    max-width: 100%;
     width: 50%;
     margin: 20px auto;
     text-align: left;
