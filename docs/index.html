@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_components_tab.css">
+    <link rel="stylesheet" href="style_firmware_tab.css">
     <title>Cheburashka TM</title>
 	<link rel="icon" type="image/png" href="imgs/logo.png">
 </head>
@@ -12,6 +14,8 @@
         <ul>
             <li><a href="#about">About</a></li>
             <li><a href="#printing">3D Printing</a></li>
+            <li><a href="#components">Components</a></li>
+            <li><a href="#assembly">Assembly</a></li>
             <li><a href="#firmware">Firmware</a></li>
             <li><a href="#gui">GUI</a></li>
         </ul>
@@ -35,14 +39,82 @@
         <p><span class="highlight">All models you can find <a href="../stl/">here</a>.</span></p>
     </section>
 
+
+    <section id="components">
+        <div class="track track-left">
+            <img src="imgs/BAT-Surpass_1500kv.png" class="track-item t-l-1">
+            <img src="imgs/BLHeli_50A.png" class="track-item t-l-2">
+            <img src="imgs/BLHeli_80A.png" class="track-item t-l-3">
+            <img src="imgs/Spinner_Production_900kv.png" class="track-item t-l-4">
+            <img src="imgs/accel_and_gyro.png" class="track-item t-l-5">
+            <img src="imgs/lipo6s.png" class="track-item t-l-6">
+            <img src="imgs/DHT11.png" class="track-item t-l-7">
+        </div>
+
+        <div class="track track-right">
+            <img src="imgs/propeller.png" class="track-item t-r-2">
+            <img src="imgs/tx16s.png" class="track-item t-r-3">
+            <img src="imgs/esp32.png" class="track-item t-r-4">
+            <img src="imgs/matek_gps_and_compas.png" class="track-item t-r-5">
+            <img src="imgs/mini_osd.png" class="track-item t-r-6">
+            <img src="imgs/r9m_ota_mini.png" class="track-item t-r-7">
+            <img src="imgs/r9m_reciever.png" class="track-item t-r-8">
+        </div>
+    
+        <h1>Components</h1>
+        <p>All that I list below is everything that is in my Cheburashka, <span class="highlight">this is not a recommendation for purchase and you can find better modules</span>. After the list, I'll tell you what can be improved by modules.</p>
+		<ul>
+            <li>Cheburashka's Brains - <span class="highlight">ESP 32</span></li>
+            <li>ESC for rotary engine - <span class="highlight">ESC 50A BLHeli (x2)</span></li>
+            <li>ESC for main engine - <span class="highlight">ESC 80A BLHeli</span></li>
+            <li>Rotary engines - <span class="highlight">BAT-Surpass B2808 1500KV (x2)</span></li>
+            <li>Main engine - <span class="highlight">Motor 3115 900kv Spinner Production</span></li>
+            <li>GPS and Compas Module - <span class="highlight">Matek GPS & Compass M8Q-5883</span></li>
+            <li>Accelerometer and Gyro Module - <span class="highlight">MPU 6050 (for Arduino)</span></li>
+            <li>Radio transmitter (Cheburashka control) - <span class="highlight">FRSKY R9mini-OTA</span></li>
+            <li>Radio resiever (Cheburashka control) - <span class="highlight">R9M Module</span></li>
+            <li>Radio resiever (Cheburashka control) - <span class="highlight">R9M Module</span></li>
+            <li>Video transmitter and camera - <span class="highlight">Foxeer camera</span></li>
+            <li>Superimposing data on analog video - <span class="highlight">MINI OSD</span></li>
+            <li>Propellers - <span class="highlight">3.5" (5 lumps, x2) & 5" (3 lumps)</span></li>
+        </ul>
+        <p>So, now a few of my recommendations. Of course, the ESP32 must be equipped with a Wi-Fi module. I also advise you to purchase a pin expander for the board.</p>
+        <p>I recommend buying rotary motors with a characteristic of the order of 2000-3000 KV. It will be more comfortable for 3.5" diameter propellers. The main engine should be of the order of 1500-2000 KV.</p>
+        <p>There are much more interesting radio transmitters, but I still advise you to look at the information about the ExpressLRS firmware. This firmware is also suitable for FrSky R9 Mini OTA. Such a connection can operate at a distance of up to ~15 km, which ensures high-quality signal reception and safe operation.</p>
+        <p>The battery can be from 4S to 6S. When using the 4S, you will be able to install a larger battery. I also advise you to buy shrink wrap and nylon wires of different thicknesses.</p>
+        <p>M3 bolts are used. Buy nylon ones about 1.5 cm long — you can always cut them to the desired length — as well as metal ones about 1 cm long. Don't forget about nuts and 4-mm-high insert bushings</p>
+    </section>
+
+    <section id="assembly">
+        <h1>Assembly</h1>
+
+    </section>
+
     <section id="firmware">
         <h1>Firmware</h1>
-        <p>Раздел посвящен прошивкам и программному обеспечению.</p>
+        <p>Now let's talk about how to flash esp32. I recommend doing this on a Unix system.</p>
+		<ul>
+            <li>Install the <a href="https://www.arduino.cc/en/software">Arduino IDE.</a></li>
+            <li>Please read the <a href="https://randomnerdtutorials.com/esp32-littlefs-arduino-ide/">article</a>. You need to download the <a href="../firmwares/esp32_firmware/data/firmware_vars.json">firmware_vars.json</a> on ESP32.</li>
+            <li>Open the <a href="../firmwares/esp32_firmware/esp32_firmware.ino">esp32_firmware.ino</a> file in IDE.</li>
+            <li>Install the necessary libraries:</li>
+            <ul>
+                <li><a href="https://github.com/adafruit/Adafruit_MPU6050">Adafruit_MPU6050</a></li>
+                <li><a href="https://github.com/adafruit/adafruit_sensor">Adafruit_Sensor</a></li>
+                <li><a href="https://github.com/adafruit/dht-sensor-library">DHT</a></li>
+                <li><a href="https://github.com/mprograms/QMC5883LCompass">QMC5883LCompass</a></li>
+                <li><a href="https://github.com/mikalhart/TinyGPSPlus">TinyGPS++</a></li>
+                <li><a href="https://github.com/madhephaestus/ESP32Servo">ESP32Servo</a></li>
+                <li><a href="https://github.com/bolderflight/sbus">Sbus</a></li>
+                <li><a href="https://github.com/bblanchon/ArduinoJson">ArduinoJson</a></li>
+                <li><a href="https://github.com/littlefs-project/littlefs">LittleFS</a></li>
+            </ul>
+            <li>Compile it. If the compilation is successful, connect the esp32 and download the firmware on ESP32.</li>
+        </ul>
     </section>
 
     <section id="gui">
         <h1>GUI</h1>
-        <p>Графический интерфейс пользователя и его разработка.</p>
     </section>
 </body>
 </html>
