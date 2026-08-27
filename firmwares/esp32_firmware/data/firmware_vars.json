@@ -391,7 +391,7 @@
       "val": 1000,
       "units": "ms",
       "field_name": "PWM Left Engine",
-      "field_obj": "spinBox_re_pwm",
+      "field_obj": "label_le",
       "info": ""
     }
   },
@@ -400,7 +400,7 @@
       "val": 1000,
       "units": "ms",
       "field_name": "PWM Right Engine",
-      "field_obj": "spinBox_le_pwm",
+      "field_obj": "label_re",
       "info": ""
     }
   },
@@ -409,7 +409,7 @@
       "val": 1500,
       "units": "ms",
       "field_name": "PWM Main Engine",
-      "field_obj": "spinBox_me_pwm",
+      "field_obj": "label_me",
       "info": ""
     }
   },

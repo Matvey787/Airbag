@@ -25,20 +25,20 @@ View3D {
         eulerRotation: Qt.vector3d(sensorData.pitch, -sensorData.yaw, sensorData.roll)
 
         // ===== Ваша 3D модель =====
-        Model {
-            id: airbagModel
-            // Путь к файлу. Если файл лежит в папке assets, то "assets/drone.glb"
-            source: "airbag.glb" 
-            
-            // Масштабирование, если модель слишком большая или маленькая
-            scale: Qt.vector3d(10, 10, 10)
-            
-            // Позиционирование относительно центра вращения (gimbal)
-            position: Qt.vector3d(0, 0, 0)
-            
-            // Материал можно не задавать, если он уже есть внутри .glb файла
-            // materials: PrincipledMaterial { baseColor: "white" }
-        }
+        // Model {
+        //     id: airbagModel
+        //     // Путь к файлу. Если файл лежит в папке assets, то "assets/drone.glb"
+        //     source: "airbag.glb" 
+        //     
+        //     // Масштабирование, если модель слишком большая или маленькая
+        //     scale: Qt.vector3d(10, 10, 10)
+        //     
+        //     // Позиционирование относительно центра вращения (gimbal)
+        //     position: Qt.vector3d(0, 0, 0)
+        //     
+        //     // Материал можно не задавать, если он уже есть внутри .glb файла
+        //     // materials: PrincipledMaterial { baseColor: "white" }
+        // }
 
         // ===== Оси координат (оставляем для наглядности) =====
         

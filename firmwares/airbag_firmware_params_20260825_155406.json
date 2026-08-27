@@ -1,0 +1,185 @@
+{
+    "ACCEL_X": {
+        "val": 0.38429999351501465
+    },
+    "ACCEL_Y": {
+        "val": -0.7649000287055969
+    },
+    "ACCEL_Z": {
+        "val": -10.194499969482422
+    },
+    "ANG_VEL_X": {
+        "val": -2.595400094985962
+    },
+    "ANG_VEL_Y": {
+        "val": 0.5037999749183655
+    },
+    "ANG_VEL_Z": {
+        "val": 1.9388999938964844
+    },
+    "CH_ARM": {
+        "val": 4.0
+    },
+    "CH_ARM_MAX": {
+        "val": 2000.0
+    },
+    "CH_ARM_MIN": {
+        "val": 1500.0
+    },
+    "CH_ARM_VAL": {
+        "val": 1811.0
+    },
+    "CH_FORWARD": {
+        "val": 2.0
+    },
+    "CH_FORWARD_MAX": {
+        "val": 1800.0
+    },
+    "CH_FORWARD_MIN": {
+        "val": 172.0
+    },
+    "CH_FORWARD_VAL": {
+        "val": 176.0
+    },
+    "CH_HH": {
+        "val": 8.0
+    },
+    "CH_HH_MAX": {
+        "val": 1100.0
+    },
+    "CH_HH_MIN": {
+        "val": 900.0
+    },
+    "CH_HH_VAL": {
+        "val": 992.0
+    },
+    "CH_MAIN_ENGINE": {
+        "val": 10.0
+    },
+    "CH_MAIN_ENGINE_MAX": {
+        "val": 1100.0
+    },
+    "CH_MAIN_ENGINE_MIN": {
+        "val": 172.0
+    },
+    "CH_MAIN_ENGINE_VAL": {
+        "val": 200.0
+    },
+    "CH_ROTATE": {
+        "val": 0.0
+    },
+    "CH_ROTATE_MAX": {
+        "val": 1800.0
+    },
+    "CH_ROTATE_MIN": {
+        "val": 172.0
+    },
+    "CH_ROTATE_VAL": {
+        "val": 998.0
+    },
+    "GPS_DAY": {
+        "val": 26.0
+    },
+    "GPS_HOUR": {
+        "val": 10.0
+    },
+    "GPS_LAT": {
+        "val": 54.441200256347656
+    },
+    "GPS_LON": {
+        "val": 36.16590118408203
+    },
+    "GPS_MIN": {
+        "val": 26.0
+    },
+    "GPS_MONTH": {
+        "val": 8.0
+    },
+    "GPS_SAT": {
+        "val": 10.0
+    },
+    "GPS_SEC": {
+        "val": 39.0
+    },
+    "GPS_SPD": {
+        "val": 1.444599986076355
+    },
+    "GPS_YEAR": {
+        "val": 2026.0
+    },
+    "HH_DT": {
+        "val": 0.019999999552965164
+    },
+    "HH_MAG_CORRECTION_GAIN": {
+        "val": 0.07999999821186066
+    },
+    "HH_MAX_MAG_RATE": {
+        "val": 15.0
+    },
+    "HH_ROT_WEIGHT_GYRO": {
+        "val": 0.800000011920929
+    },
+    "HH_STICK_RATE_SCALE": {
+        "val": 90.0
+    },
+    "HUM_FRONT": {
+        "val": 53.900001525878906
+    },
+    "HUM_REAR": {
+        "val": 46.20000076293945
+    },
+    "MAG_DT_MAX": {
+        "val": 0.10000000149011612
+    },
+    "MAG_MAX_REJECT_STREAK": {
+        "val": 10.0
+    },
+    "MAG_SPIKE_THRESHOLD": {
+        "val": 45.0
+    },
+    "PID_D": {
+        "val": 0.05000000074505806
+    },
+    "PID_D_FILTER_ALPHA": {
+        "val": 0.20000000298023224
+    },
+    "PID_I": {
+        "val": 0.029999999329447746
+    },
+    "PID_INTEGRAL_LIMIT": {
+        "val": 200.0
+    },
+    "PID_MAX_OUTPUT": {
+        "val": 1000.0
+    },
+    "PID_MAX_STEP_PER_LOOP": {
+        "val": 15.0
+    },
+    "PID_P": {
+        "val": 1.5
+    },
+    "PITCH": {
+        "val": 2.152600049972534
+    },
+    "PWM_LE": {
+        "val": 1018.0
+    },
+    "PWM_ME": {
+        "val": 1515.0
+    },
+    "PWM_RE": {
+        "val": 1000.0
+    },
+    "ROLL": {
+        "val": 4.291200160980225
+    },
+    "TEMP_FRONT": {
+        "val": 23.200000762939453
+    },
+    "TEMP_REAR": {
+        "val": 24.399999618530273
+    },
+    "YAW": {
+        "val": 62.772300720214844
+    }
+}
