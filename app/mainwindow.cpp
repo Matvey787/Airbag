@@ -170,7 +170,7 @@ void MainWindow::updateOnTimer()
 {
 	chartsHandler_->updateAll(firmwareHandler);
 
-	gizmoController_->update(firmwareHandler);
+	gizmoController_->update(*firmwareHandler);
 
-	mapController_->updateMap(firmwareHandler);
+	mapController_->updateMap(*firmwareHandler);
 }
