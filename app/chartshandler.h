@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QString>
 #include <QLabel>
+#include <functional>
+#include <initializer_list>
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
@@ -25,6 +27,14 @@ public:
 		const QStringList& seriesKeys,
 		const QStringList& seriesNames);
 
+QChartView* createStyledChart(QWidget* parentWidget,
+	const QString& titleY,
+	float minY,
+	float maxY,
+	std::initializer_list<QString> seriesNames,
+	std::initializer_list<std::function<float(const QHash<QString, float>&)>>
+		seriesFunctions);
+
 void updateAll(const FirmwareVarsHandler* firmwareParamsHandler);
 void addLabelBinding(QLabel* label, const QString& key);
 
@@ -34,6 +44,8 @@ private:
 		QChart* chart;
 		QList<QLineSeries*> series;
 		QStringList seriesKeys;
+		QList<std::function<float(const QHash<QString, float>&)>>
+			seriesFunctions;
 	};
 
 	QList<ChartContext> chartsList_;

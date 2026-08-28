@@ -227,6 +227,11 @@ const float FirmwareVarsHandler::operator[](const QString& key) const
 	return firmwareParams_.value(key, 0.0f);
 }
 
+const QHash<QString, float>& FirmwareVarsHandler::parameters() const
+{
+	return firmwareParams_;
+}
+
 void FirmwareVarsHandler::saveParamsToFile(QWidget* parent)
 {
 	QString defaultFileName = QString("airbag_firmware_params_%1.json").arg(

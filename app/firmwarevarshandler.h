@@ -20,6 +20,7 @@ public:
 	explicit FirmwareVarsHandler(QObject* parent);
 	void onParamUpdated(const QString& key, float val);
 	const float operator[](const QString& key) const;
+	const QHash<QString, float>& parameters() const;
 	void readFirmwareVars(QWidget* formRoot);
 
 	// Save current params (only key -> {"val": number}) to a JSON file chosen by the user

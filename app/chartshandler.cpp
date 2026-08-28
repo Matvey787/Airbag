@@ -1,13 +1,14 @@
 #include "chartshandler.h"
-#include "firmwarevarshandler.h"
 
-#include <QColor> // Вместо QColorConstants
+#include <QColor>
 #include <QDateTime>
 #include <QGraphicsLayout>
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QtCharts/QDateTimeAxis>
 #include <QtCharts/QValueAxis>
+
+#include "firmwarevarshandler.h"
 
 ChartsHandler::ChartsHandler(QObject* parent) : QObject(parent) {}
 
@@ -49,7 +50,7 @@ QChartView* ChartsHandler::createStyledChart(QWidget* parentWidget,
 	}
 
 	auto* axisX = new QDateTimeAxis();
-	axisX->setFormat("HH:mm:ss");
+	axisX->setFormat("HH:mm");
 	axisX->setTitleBrush(QBrush(QColor("orange")));
 	axisX->setLabelsColor(QColor("orange"));
 	axisX->setGridLineColor(QColor("#404040"));
@@ -77,10 +78,31 @@ QChartView* ChartsHandler::createStyledChart(QWidget* parentWidget,
 
 	chartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	chartsList_.append({ chart, createdSeries, seriesKeys });
+	chartsList_.append({ chart, createdSeries, seriesKeys, {} });
 
 	parentWidget->layout()->addWidget(chartView);
 
+	return chartView;
+}
+
+QChartView* ChartsHandler::createStyledChart(QWidget* parentWidget,
+	const QString& titleY,
+	float minY,
+	float maxY,
+	std::initializer_list<QString> seriesNames,
+	std::initializer_list<std::function<float(const QHash<QString, float>&)>>
+		seriesFunctions)
+{
+	const QList<std::function<float(const QHash<QString, float>&)>>
+		functionList(seriesFunctions);
+	auto* chartView = createStyledChart(parentWidget,
+		titleY,
+		minY,
+		maxY,
+		QStringList(functionList.size(), QString()),
+		QStringList(seriesNames));
+	chartsList_.last().seriesKeys.clear();
+	chartsList_.last().seriesFunctions = functionList;
 	return chartView;
 }
 
@@ -96,7 +118,7 @@ void ChartsHandler::appendAndTrim(QLineSeries* series, double x, float y)
 
 void ChartsHandler::addLabelBinding(QLabel* label, const QString& key)
 {
-labelBindings_.append({ label, key });
+	labelBindings_.append({ label, key });
 }
 
 void ChartsHandler::updateAll(const FirmwareVarsHandler* firmwareParamsHandler)
@@ -113,11 +135,21 @@ void ChartsHandler::updateAll(const FirmwareVarsHandler* firmwareParamsHandler)
 	{
 		for (int i = 0; i < ctx.series.size(); ++i)
 		{
-			if (i >= ctx.seriesKeys.size())
+			if (i >= ctx.seriesKeys.size() && i >= ctx.seriesFunctions.size())
 				break;
 
-			const QString& key = ctx.seriesKeys[i];
-			appendAndTrim(ctx.series[i], nowMs, (*firmwareParamsHandler)[key]);
+			float value = 0.0f;
+			if (i < ctx.seriesFunctions.size())
+			{
+				value =
+					ctx.seriesFunctions[i](firmwareParamsHandler->parameters());
+			}
+			else
+			{
+				const QString& key = ctx.seriesKeys[i];
+				value			   = (*firmwareParamsHandler)[key];
+			}
+			appendAndTrim(ctx.series[i], nowMs, value);
 		}
 
 		auto axes = ctx.chart->axes(Qt::Horizontal);
@@ -134,9 +166,9 @@ void ChartsHandler::updateAll(const FirmwareVarsHandler* firmwareParamsHandler)
 		}
 	}
 
-for (const auto& binding : labelBindings_)
-{
-	binding.label->setText(
-		QString::number((*firmwareParamsHandler)[binding.key]));
-}
+	for (const auto& binding : labelBindings_)
+	{
+		binding.label->setText(
+			QString::number((*firmwareParamsHandler)[binding.key]));
+	}
 }

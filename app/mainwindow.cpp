@@ -89,14 +89,14 @@ chartsHandler_->createStyledChart(ui->pwmChartContainer,
 { "PWM_ME", "PWM_LE", "PWM_RE" },
 { "Main Engine", "Left Engine", "Right Engine" });
 
-// chartsHandler_.createStyledChart(ui->deltaPWMChartContainer,
-// 	"PWM, ms",
-// 	-1010,
-// 	1010,
-// 	{ "left - right PWM" },
+chartsHandler_->createStyledChart(ui->deltaPWMChartContainer,
+	"PWM, ms",
+	-1010,
+	1010,
+	{ "left - right PWM" },
 
-// 	{ [](const QHash<QString, float>& p)
-// 		{ return p.value("PWM_LE") - p.value("PWM_RE"); } });
+	{ [](const QHash<QString, float>& p)
+		{ return p.value("PWM_LE") - p.value("PWM_RE"); } });
 
  chartsHandler_->createStyledChart(ui->accelerationChartContainer,
 		"Acceleration, m/s^2",
