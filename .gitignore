@@ -1,7 +1,8 @@
 Airbag
 .venv
 .vscode
-app/map/central-fed-district-260818.mbtiles
-app/map/central-fed-district-260818.osm.pbf
-*.txt
+map/central-fed-district-260818.mbtiles
+map/central-fed-district-260818.osm.pbf
 build/
+packaging/
+*.AppImage
