@@ -17,7 +17,7 @@ signals:
 	void paramUpdatedSendToEsp(const QString& key, float val);
 
 public:
-	FirmwareVarsHandler(QObject* parent);
+	explicit FirmwareVarsHandler(QObject* parent);
 	void onParamUpdated(const QString& key, float val);
 	const float operator[](const QString& key) const;
 	void readFirmwareVars(QWidget* formRoot);
