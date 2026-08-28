@@ -50,9 +50,30 @@ section p {
 	align-self: center;
 }
 
+.content-img {
+    width: 400px;
+    height: 400px;
+    object-fit: contain;
+	align-self: center;
+}
+
+.content-img-container {
+    display: flex;          
+    justify-content: center;
+    align-items: center;     
+}
+
 h1 {
 	color: #ff8c00;
 	font-size: 48px;
+	margin-bottom: 30px;
+	text-align: center;
+	z-index: 1;
+}
+
+h2 {
+	color: #ff8c00;
+	font-size: 35px;
 	margin-bottom: 30px;
 	text-align: center;
 	z-index: 1;
@@ -139,4 +160,38 @@ nav a {
 nav a:hover {
 	background-color: #ff8c00;
 	color: #000000;
+}
+
+table {
+	margin: 0 auto;
+	border-collapse: separate;
+	width: 50%;
+	border-radius: 10px;
+	border: 2px solid #FFFFFF;
+}
+
+td, th {
+	padding: 12px 15px;
+	text-align: center;
+	font-size: 20px;
+}
+
+th {
+	color: #000000;
+	font-size: 25px;
+	font-weight: 700;
+}
+
+tr:nth-child(even) {
+	color: #c56c00;
+    background-color: #000000;
+}
+
+tr:nth-child(odd) {
+	color: #000000;
+    background-color: #c56c00;
+}
+
+tr:hover {
+    background-color: #dddddd60;
 }

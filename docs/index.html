@@ -37,6 +37,20 @@
 
     <section id="printing">
         <h1>3D Printing</h1>
+        <p>Model unfolding:</p>
+
+        <img src="imgs/front.png" class="content-img">
+
+        <div class="content-img-container">
+            <img src="imgs/left.png" class="content-img">
+            <img src="imgs/top.png" class="content-img">
+            <img src="imgs/bottom.png" class="content-img">
+            <img src="imgs/right.png" class="content-img">
+        </div>
+
+        <img src="imgs/rear.png" class="content-img">
+
+        
         <p>All 3D models were created in Blender. In total, three versions of Cheburashka were created, and perhaps this is not the end yet. Each time, some shortcomings would appear that had to be fixed in subsequent version</p>
 
         <p>Here is the latest, highest‑quality, and most well‑thought‑out version. <span class="highlight">The Cheburashka body is waterproof if the engineering hole for the wires of the main cushion motor is sealed.</span></p>
@@ -92,8 +106,127 @@
         <p>M3 bolts are used. Buy nylon ones about 1.5 cm long — you can always cut them to the desired length — as well as metal ones about 1 cm long. Don't forget about nuts and 4-mm-high insert bushings</p>
     </section>
 
-    <section id="assembly">
+    <section id="assembly"> 
         <h1>Assembly</h1>
+        <h2>Part 1: Assemble Model</h2>
+        <p>So, to assemble the model, you’ll need 16 M3 nylon bolts, each 1.5 cm long. Why nylon? Because you can cut them to the desired length, which is very convenient. You’ll also need about 20 4-mm-tall insert bushings for M3 bolts. </p>
+
+        <p>First, you need to glue the bottom in place so that the body is airtight. For this, I used PU-40 polyurethane sealant.</p>
+
+        <div class="content-img-container">
+            <img src="imgs/assemble1.png" class="content-img">
+            <img src="imgs/pu40.png" class="content-img">
+        </div>
+
+        <p>Next, carefully solder the insert bushings in place using a soldering iron. I didn’t have a special tool for this, but you can use a long bolt, screw the insert bushing onto it, heat it with a soldering iron, and hold the bolt in place with pliers. I think it’s obvious where to solder them in, but I’ve marked the spots with red circles just in case.</p>
+
+        <img src="imgs/assemble2.png" class="content-img">
+
+        <p>Do the same carefully on top and in bracing.</p>
+
+        <div class="content-img-container">
+            <img src="imgs/assemble3.png" class="content-img">
+            <img src="imgs/assemble4.png" class="content-img">
+            <img src="imgs/assemble10.png" class="content-img">
+        </div>
+
+        <p>Attach the lugs. I think it’s pretty clear how to position them to fit into the holes. Tighten the bolts onto the nuts. It’s quite possible that the M3 bolts won’t fit through the holes, and that’s perfectly normal—just drill them out if necessary.</p>
+
+        <img src="imgs/assemble5.png" class="content-img">
+
+        <p>Next, you need to screw on the motors. They usually come with bolts; I recommend screwing a nylon nut onto these bolts. During prolonged operation, they tend to heat up from the motor windings, and without you noticing, they can melt through the mounting point, so the nylon nut acts as a buffer.</p>
+
+        <img src="imgs/assemble6.png" class="content-img">
+
+        <p>Fit the main motor housing in place, aligning the holes so that the wires can be passed through them. Next, screw in the main motor, seal its housing, and seal the opening in the body where the wires pass through.</p>
+
+        <img src="imgs/assemble7.png" class="content-img">
+
+        <p>Next, attach the skeleton from below.</p>
+
+        <img src="imgs/assemble8.png" class="content-img">
+
+        <p>The two remaining parts are needed to clamp the pocket between them.</p>
+
+        <img src="imgs/assemble9.png" class="content-img">
+
+        <p>Success! You’ve assembled Cheburashka model.</p>
+
+        <h2>Part 2: Assemble Electronics</h2>
+        <p>So, you’ve assembled the Cheburashka model. Now let’s talk about the electronics.</p>
+
+        <p>I strongly recommend purchasing heat-shrink tubing in various diameters in advance. For the power wires, you’ll need <span class="highlight">XT60</span> connectors and wires with a fairly large gauge—I’m using wires with a diameter of about 3 mm. For connecting the modules, wires with a smaller gauge, about 1 mm, will suffice.</p>
+
+        <img src="imgs/xt60.png" class="content-img">
+
+        <p>I soldered everything using a <span class="highlight">TS100</span> soldering iron. Also, buy solder flux and solder. For solder, I recommend <span class="highlight">MECHANIC TY-V866.</span></p>
+
+        <div class="content-img-container">
+            <img src="imgs/ts100.png" class="content-img">
+            <img src="imgs/MECHANIC_TY-V866.png" class="content-img">
+        </div>
+
+        <p>Below is a table and a wiring diagram. It’s hard to get confused here. Just look at the labels on the module and the ESP32. There’s no need to say anything more.</p>
+
+    
+        <table>
+            <tr>
+                <th>Module pin</th>
+                <th>ESP32 pin</th>
+            </tr>
+            <tr>
+                <td>ESC Main Engine Signal</td>
+                <td>GPIO 13</td>
+            </tr>
+            <tr>
+                <td>ESC Left Engine Signal</td>
+                <td>GPIO 14</td>
+            </tr>
+            <tr>
+                <td>ESC Right Engine Signal</td>
+                <td>GPIO 15</td>
+            </tr>
+            <tr>
+                <td>Front DHT11</td>
+                <td>GPIO 23</td>
+            </tr>
+            <tr>
+                <td>Rear DHT11</td>
+                <td>GPIO 19</td>
+            </tr>
+            <tr>
+                <td>MPU6050 SDA</td>
+                <td>GPIO 21</td>
+            </tr>
+            <tr>
+                <td>MPU6050 SCL</td>
+                <td>GPIO 22</td>
+            </tr>
+            <tr>
+                <td>OTA MINI RECEIVER RX</td>
+                <td>GPIO 16</td>
+            </tr>
+            <tr>
+                <td>OTA MINI RECEIVER TX</td>
+                <td>GPIO 26</td>
+            </tr>
+            <tr>
+                <td>GPS RX</td>
+                <td>GPIO 17</td>
+            </tr>
+            <tr>
+                <td>GPS TX</td>
+                <td>GPIO 18</td>
+            </tr>
+            <tr>
+                <td>MINI OSD RX</td>
+                <td>GPIO 32</td>
+            </tr>
+            <tr>
+                <td>MINI OSD TX</td>
+                <td>GPIO 33</td>
+            </tr>
+        </table>
 
     </section>
 

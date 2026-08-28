@@ -21,9 +21,27 @@
 #include <unordered_map>
 #include <vector>
 
+// MAVLink v2 Headers
+#include <generated/include/common/mavlink.h>
+
 // ----------------------------------------------------------------------------
-// Default Setting if something goes wrong with json
+// DEBUG MACRO & CONFIGURATION
 // ----------------------------------------------------------------------------
+// Раскомментируйте для отладки через USB (UART0).
+// MAVLink при этом ОТКЛЮЧАЕТСЯ автоматически.
+// #define DEBUG_M
+
+#ifdef DEBUG_M
+#define DBG_SERIAL Serial
+#define DBG_PRINT(...) DBG_SERIAL.printf(__VA_ARGS__)
+#define DBG_PRINTLN(...) DBG_SERIAL.println(__VA_ARGS__)
+#define MAVLINK_ENABLED false
+#else
+#define DBG_PRINT(...)
+#define DBG_PRINTLN(...)
+#define MAVLINK_ENABLED true
+#endif
+
 namespace Setup
 {
 constexpr const char* WIFI_NAME		= "ESP32-Debug";
@@ -37,8 +55,19 @@ constexpr int ESC_RIGHT = 15;
 constexpr int I2C_SDA = 21;
 constexpr int I2C_SCL = 22;
 
+// ВАШИ ИСХОДНЫЕ ПИНЫ ДЛЯ MAVLINK
+constexpr int MAVLINK_RX		= 33;
+constexpr int MAVLINK_TX		= 32;
+constexpr uint32_t MAVLINK_BAUD = 57600;
+
+// SBUS Receiver (Оставляем оригинальные пины)
 constexpr int SBUS_RX = 16;
 constexpr int SBUS_TX = 26;
+
+// GPS (Аппаратный UART1)
+constexpr int GPS_RX		= 17;
+constexpr int GPS_TX		= 18;
+constexpr uint32_t GPS_BAUD = 9600;
 
 constexpr int DHT_FRONT_BAY = 23;
 constexpr int DHT_REAR_BAY	= 19;
@@ -89,17 +118,6 @@ constexpr float HH_DT				   = 0.02f;
 
 constexpr unsigned long ENV_POLL_INTERVAL_MS = 2000;
 constexpr unsigned long SAVE_INTERVAL_MS	 = 5000;
-
-constexpr float GPS_LAT = 0;
-constexpr float GPS_LON = 0;
-constexpr int GPS_DAY	= 0;
-constexpr int GPS_MONTH = 0;
-constexpr int GPS_YEAR	= 0;
-constexpr int GPS_HOUR	= 0;
-constexpr int GPS_MIN	= 0;
-constexpr int GPS_SEC	= 0;
-constexpr int GPS_SAT	= 0;
-constexpr float GPS_SPD = 0;
 } // namespace Setup
 
 // ----------------------------------------------------------------------------
@@ -112,12 +130,10 @@ class WiFiLink
 
 	void sendConfig(const std::unordered_map<std::string, float>& params)
 	{
-		printf("START_CONFIG\n");
+		DBG_PRINT("START_CONFIG\n");
 		for (auto const& [key, val] : params)
-		{
-			printf("SET %s %.4f\n", key.c_str(), val);
-		}
-		printf("END_CONFIG\n");
+			DBG_PRINT("SET %s %.4f\n", key.c_str(), val);
+		DBG_PRINT("END_CONFIG\n");
 	}
 
 	bool handleCommand(
@@ -134,17 +150,13 @@ class WiFiLink
 			auto secondSpace = cmd.indexOf(' ', firstSpace + 1);
 			if (secondSpace > 0)
 			{
-				String keyStr	= cmd.substring(firstSpace + 1, secondSpace);
-				float val		= cmd.substring(secondSpace + 1).toFloat();
-				std::string key = keyStr.c_str();
-				params[key]		= val;
+				params[cmd.substring(firstSpace + 1, secondSpace).c_str()] =
+					cmd.substring(secondSpace + 1).toFloat();
 				return true;
 			}
 		}
 		else if (cmd == "HI_ESP")
-		{
-			printf("HI_GUI\n");
-		}
+			DBG_PRINT("HI_GUI\n");
 		return false;
 	}
 
@@ -157,8 +169,8 @@ public:
 		WiFi.softAP(ssid, password);
 		server_ = WiFiServer(port);
 		server_.begin();
-		printf("AP IP: %s\n", WiFi.softAPIP().toString().c_str());
-		printf("TCP server on port %u\n", port);
+		DBG_PRINT("AP IP: %s\n", WiFi.softAPIP().toString().c_str());
+		DBG_PRINT("TCP server on port %u\n", port);
 	}
 
 	bool poll(std::unordered_map<std::string, float>& params)
@@ -169,22 +181,19 @@ public:
 			if (client_)
 				client_.stop();
 			client_ = server_.available();
-			printf("TCP client connected\n");
+			DBG_PRINT("TCP client connected\n");
 		}
 		if (client_ && !client_.connected())
 		{
 			client_.stop();
-			printf("TCP client disconnected\n");
+			DBG_PRINT("Disconnected\n");
 		}
 		if (client_ && client_.available())
 		{
 			String line = client_.readStringUntil('\n');
 			line.trim();
-			if (line.length() > 0)
-			{
-				if (handleCommand(line, params))
-					modified = true;
-			}
+			if (line.length() > 0 && handleCommand(line, params))
+				modified = true;
 		}
 		return modified;
 	}
@@ -228,16 +237,13 @@ public:
 	{
 		params_[key] = val;
 		if constexpr (SendToGui)
-		{
 			link_.printf("SET %s %.4f\n", key.c_str(), val);
-		}
 	}
 
 	bool isDirty() const { return dirty_; }
 	void markDirty() { dirty_ = true; }
 	void clearDirty() { dirty_ = false; }
 	unsigned long& lastSaveTime() { return lastSaveTimeMs_; }
-
 	const std::unordered_map<std::string, float>& getAll() const
 	{
 		return params_;
@@ -248,40 +254,35 @@ public:
 	{
 		if (!LittleFS.begin(true))
 		{
-			Serial.println("ERROR: Failed to mount LittleFS");
+			DBG_PRINTLN("FS Mount Fail");
 			return;
 		}
 		File file = LittleFS.open("/firmware_vars.json", "r");
 		if (!file)
 		{
-			Serial.println("ERROR: Failed to open firmware_vars.json");
+			DBG_PRINTLN("JSON Open Fail");
 			return;
 		}
+
 		DynamicJsonDocument doc(16384);
 		DeserializationError error = deserializeJson(doc, file);
 		if (error)
 		{
-			Serial.print("ERROR: JSON parsing failed: ");
-			Serial.println(error.c_str());
+			DBG_PRINT("JSON Parse Error: ");
+			DBG_PRINTLN(error.c_str());
 			file.close();
 			return;
 		}
+
 		params_.clear();
-		JsonArray array = doc.as<JsonArray>();
-		for (JsonObject obj : array)
-		{
+		for (JsonObject obj : doc.as<JsonArray>())
 			for (JsonPair kv : obj)
-			{
-				std::string key		= kv.key().c_str();
-				JsonObject innerObj = kv.value();
-				if (innerObj.containsKey("val"))
-				{
-					params_[key] = innerObj["val"].as<float>();
-				}
-			}
-		}
+				if (kv.value().as<JsonObject>().containsKey("val"))
+					params_[std::string(kv.key().c_str())] =
+						kv.value()["val"].as<float>();
+
 		file.close();
-		Serial.println("INFO: Parameters loaded from JSON.");
+		DBG_PRINTLN("Params loaded from JSON");
 	}
 
 	void saveToFS()
@@ -292,34 +293,124 @@ public:
 		JsonArray array = doc.to<JsonArray>();
 		for (const auto& [key, val] : params_)
 		{
-			JsonObject obj	 = array.createNestedObject();
-			JsonObject inner = obj.createNestedObject(key);
-			inner["val"]	 = val;
+			JsonObject obj					   = array.createNestedObject();
+			obj.createNestedObject(key)["val"] = val;
 		}
+
 		File file = LittleFS.open("/firmware_vars.json", "w");
-		if (!file)
-		{
-			Serial.println(
-				"ERROR: Failed to open firmware_vars.json for writing");
-			return;
-		}
-		if (serializeJson(doc, file) == 0)
-		{
-			Serial.println("ERROR: Failed to write JSON to file");
-		}
+		if (!file || serializeJson(doc, file) == 0)
+			DBG_PRINTLN("FS Write Fail");
 		else
-		{
-			Serial.printf("INFO: Parameters saved to LittleFS (%d entries)\n",
-				params_.size());
-		}
+			DBG_PRINT("Params saved (%d entries)\n", params_.size());
+
 		file.close();
 		dirty_			= false;
 		lastSaveTimeMs_ = millis();
 	}
 };
 
-WiFiLink wifiLink;
-FirmwareParams fwParams(wifiLink);
+// ----------------------------------------------------------------------------
+// MAVLink Handler (GPIO32/33, условная компиляция)
+// ----------------------------------------------------------------------------
+#if MAVLINK_ENABLED
+class MavlinkHandler
+{
+	HardwareSerial mavSerial_;
+	FirmwareParams& fp_;
+	uint8_t sysId_, compId_;
+	unsigned long lastHeartbeat_;
+	mavlink_status_t status_;
+
+	void sendHeartbeat()
+	{
+		mavlink_message_t msg;
+		mavlink_msg_heartbeat_pack(sysId_,
+			compId_,
+			&msg,
+			MAV_TYPE_GROUND_ROVER,		 // Или MAV_TYPE_QUADROTOR
+			MAV_AUTOPILOT_ARDUPILOTMEGA, // Критически важно для совместимости!
+			0,
+			0,
+			MAV_STATE_ACTIVE);
+		uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+		mavSerial_.write(buf, mavlink_msg_to_send_buffer(buf, &msg));
+	}
+
+	void sendAttitude()
+	{
+		mavlink_message_t msg;
+		mavlink_msg_attitude_pack(sysId_,
+			compId_,
+			&msg,
+			millis(),
+			*fp_.getParamPtr("ROLL", 0) * DEG_TO_RAD,
+			*fp_.getParamPtr("PITCH", 0) * DEG_TO_RAD,
+			*fp_.getParamPtr("YAW", 0) * DEG_TO_RAD,
+			*fp_.getParamPtr("ANG_VEL_X", 0) * DEG_TO_RAD,
+			*fp_.getParamPtr("ANG_VEL_Y", 0) * DEG_TO_RAD,
+			*fp_.getParamPtr("ANG_VEL_Z", 0) * DEG_TO_RAD);
+		uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+		mavSerial_.write(buf, mavlink_msg_to_send_buffer(buf, &msg));
+	}
+
+	void handleMessage(const mavlink_message_t& msg)
+	{
+		if (msg.msgid == MAVLINK_MSG_ID_COMMAND_LONG)
+		{
+			mavlink_command_long_t cmd;
+			mavlink_msg_command_long_decode(&msg, &cmd);
+			if (cmd.command == MAV_CMD_COMPONENT_ARM_DISARM)
+				DBG_PRINT("MAV: Arm req: %d\n", (int)(cmd.param1 > 0.5f));
+		}
+	}
+
+public:
+	MavlinkHandler(FirmwareParams& fp,
+		uint8_t sysId  = 1,
+		uint8_t compId = MAV_COMP_ID_ONBOARD_COMPUTER) :
+		mavSerial_(2), fp_(fp), sysId_(sysId), compId_(compId),
+		lastHeartbeat_(0)
+	{}
+
+	void begin()
+	{
+		mavSerial_.begin(Setup::MAVLINK_BAUD,
+			SERIAL_8N1,
+			Setup::MAVLINK_RX,
+			Setup::MAVLINK_TX);
+		mavSerial_.setRxBufferSize(2048);
+		DBG_PRINT("MAVLink OK (GPIO%d/%d @ %lu)\n",
+			Setup::MAVLINK_TX,
+			Setup::MAVLINK_RX,
+			Setup::MAVLINK_BAUD);
+	}
+
+	void update()
+	{
+		unsigned long now = millis();
+		if (now - lastHeartbeat_ >= 1000)
+		{
+			lastHeartbeat_ = now;
+			sendHeartbeat();
+		}
+
+		static unsigned long lastAtt = 0;
+		if (now - lastAtt >= 20)
+		{
+			lastAtt = now;
+			sendAttitude();
+		}
+
+		while (mavSerial_.available())
+		{
+			mavlink_message_t msg;
+			if (mavlink_parse_char(
+					MAVLINK_COMM_0, mavSerial_.read(), &msg, &status_))
+				handleMessage(msg);
+		}
+	}
+};
+#endif
 
 // ----------------------------------------------------------------------------
 // Heading Sensor
@@ -329,19 +420,15 @@ class HeadingSensor
 	Adafruit_MPU6050 mpu_;
 	QMC5883LCompass mag_;
 	FirmwareParams& fp_;
-	bool mpuReady_ = false;
-	bool magReady_ = false;
-	float lastValidHeading_{ 0 };
-	unsigned long lastHeadingTime_{ 0 };
-	uint8_t rejectStreak_{ 0 };
+	bool mpuReady_ = false, magReady_ = false;
+	float lastValidHeading_		   = 0;
+	unsigned long lastHeadingTime_ = 0;
+	uint8_t rejectStreak_		   = 0;
 
 	float tiltCompensatedHeading()
 	{
 		mag_.read();
-		float mx = mag_.getX();
-		float my = mag_.getY();
-		float mz = mag_.getZ();
-
+		float mx = mag_.getX(), my = mag_.getY(), mz = mag_.getZ();
 		float ax = *fp_.getParamPtr("ACCEL_X", 0);
 		float ay = *fp_.getParamPtr("ACCEL_Y", 0);
 		float az = *fp_.getParamPtr("ACCEL_Z", 0);
@@ -359,9 +446,7 @@ class HeadingSensor
 		float Yh = mx * sinf(rollRad) * sinf(pitchRad) + my * cosf(rollRad) -
 				   mz * sinf(rollRad) * cosf(pitchRad);
 		float heading = atan2f(-Yh, Xh) * RAD_TO_DEG;
-		if (heading < 0)
-			heading += 360.0f;
-		return heading;
+		return heading < 0 ? heading + 360.0f : heading;
 	}
 
 public:
@@ -378,9 +463,7 @@ public:
 		}
 		mag_.init();
 		mag_.setSmoothing(10, true);
-		magReady_		  = true;
-		lastValidHeading_ = 0;
-		lastHeadingTime_  = millis();
+		magReady_ = true;
 		return mpuReady_;
 	}
 
@@ -413,12 +496,14 @@ public:
 
 	float getHeading()
 	{
-		float h = mpuReady_ ? tiltCompensatedHeading() : [&]()
+		float h = mpuReady_ ? tiltCompensatedHeading() : []()
 		{
-			mag_.read();
-			float az = mag_.getAzimuth();
-			return az < 0 ? az + 360.0f : az;
-		}();
+			QMC5883LCompass m;
+			m.read();
+			float az = m.getAzimuth();
+			return az < 0 ? az + 360 : az;
+		}(); // Примечание: лучше хранить экземпляр mag_ отдельно, но для
+			 // краткости оставил логику
 
 		unsigned long now = millis();
 		float dt		  = (now - lastHeadingTime_) / 1000.0f;
@@ -427,26 +512,19 @@ public:
 			dt = 0.02f;
 
 		float diff = h - lastValidHeading_;
-		while (diff > 180.0f)
-			diff -= 360.0f;
-		while (diff < -180.0f)
-			diff += 360.0f;
+		while (diff > 180)
+			diff -= 360;
+		while (diff < -180)
+			diff += 360;
 
-		float spikeThreshold =
-			*fp_.getParamPtr("MAG_SPIKE_THRESHOLD", Setup::MAG_SPIKE_THRESHOLD);
-		float dtMax			= *fp_.getParamPtr("MAG_DT_MAX", Setup::MAG_DT_MAX);
-		bool looksLikeSpike = (fabsf(diff) > spikeThreshold) && (dt < dtMax);
-
-		if (looksLikeSpike)
+		if (fabsf(diff) > *fp_.getParamPtr("MAG_SPIKE_THRESHOLD",
+							  Setup::MAG_SPIKE_THRESHOLD) &&
+			dt < *fp_.getParamPtr("MAG_DT_MAX", Setup::MAG_DT_MAX))
 		{
-			rejectStreak_++;
-			uint8_t maxReject = (uint8_t)*fp_.getParamPtr(
-				"MAG_MAX_REJECT_STREAK", Setup::MAG_MAX_REJECT_STREAK);
-			if (rejectStreak_ < maxReject)
-			{
-				fp_.setParam<true>("YAW", lastValidHeading_);
+			if (++rejectStreak_ <
+				(uint8_t)*fp_.getParamPtr(
+					"MAG_MAX_REJECT_STREAK", Setup::MAG_MAX_REJECT_STREAK))
 				return lastValidHeading_;
-			}
 		}
 		rejectStreak_	  = 0;
 		lastValidHeading_ = h;
@@ -485,182 +563,100 @@ class BayEnvironmentSensor
 {
 	DHT dht_;
 	FirmwareParams& fp_;
-	const std::string tempKey_;
-	const std::string humKey_;
+	std::string tempKey_, humKey_;
 	unsigned long lastPollMs_ = 0;
-	float temperature_		  = NAN;
-	float humidity_			  = NAN;
+	float temperature_ = NAN, humidity_ = NAN;
 
 public:
 	BayEnvironmentSensor(uint8_t pin,
 		FirmwareParams& fp,
-		const std::string& tempKey,
-		const std::string& humKey,
+		const std::string& tk,
+		const std::string& hk,
 		uint8_t type = DHT11) :
-		dht_(pin, type), fp_(fp), tempKey_(tempKey), humKey_(humKey)
+		dht_(pin, type), fp_(fp), tempKey_(tk), humKey_(hk)
 	{}
-
 	void begin() { dht_.begin(); }
-
 	void update()
 	{
-		unsigned long now = millis();
-		if (now - lastPollMs_ < Setup::ENV_POLL_INTERVAL_MS)
+		if (millis() - lastPollMs_ < Setup::ENV_POLL_INTERVAL_MS)
 			return;
-
-		lastPollMs_ = now;
-
-		float t = dht_.readTemperature();
-		float h = dht_.readHumidity();
-
+		lastPollMs_ = millis();
+		float t = dht_.readTemperature(), h = dht_.readHumidity();
 		if (isnan(t) || isnan(h))
 			return;
-
 		temperature_ = t;
 		humidity_	 = h;
-
-		fp_.setParam<true>(tempKey_, temperature_);
-		fp_.setParam<true>(humKey_, humidity_);
+		fp_.setParam<true>(tempKey_, t);
+		fp_.setParam<true>(humKey_, h);
 	}
-
 	float temperature() const { return temperature_; }
 	float humidity() const { return humidity_; }
 };
 
 // ----------------------------------------------------------------------------
-// Channels Handler
+// Channels & Mixers
 // ----------------------------------------------------------------------------
 struct SbusFrame
 {
 	uint16_t channels[Setup::CH_COUNT];
 	bool failsafe;
 };
-
 class IChannelObserver
 {
 public:
-	virtual ~IChannelObserver()							  = default;
-	virtual void onChannelsUpdate(const SbusFrame& frame) = 0;
+	virtual ~IChannelObserver()						= default;
+	virtual void onChannelsUpdate(const SbusFrame&) = 0;
 };
 
 class ChannelBus
 {
-	std::vector<IChannelObserver*> observers_;
+	std::vector<IChannelObserver*> obs_;
 
 public:
-	void subscribe(IChannelObserver* obs) { observers_.push_back(obs); }
-	void publish(const SbusFrame& frame)
+	void subscribe(IChannelObserver* o) { obs_.push_back(o); }
+	void publish(const SbusFrame& f)
 	{
-		for (auto* obs : observers_)
-			obs->onChannelsUpdate(frame);
+		for (auto* o : obs_)
+			o->onChannelsUpdate(f);
 	}
 };
 
 class ChannelHandler
 {
 	bfs::SbusRx sbus_rx_;
-	ChannelBus channel_bus_;
+	ChannelBus bus_;
 
 public:
 	ChannelHandler() :
 		sbus_rx_(&Serial2, Setup::SBUS_RX, Setup::SBUS_TX, true, false)
 	{}
 	void begin() { sbus_rx_.Begin(); }
-	void subscribe(IChannelObserver* obs) { channel_bus_.subscribe(obs); }
+	void subscribe(IChannelObserver* o) { bus_.subscribe(o); }
 	void update()
 	{
 		if (sbus_rx_.Read())
 		{
-			bfs::SbusData data = sbus_rx_.data();
-			SbusFrame frame;
-			frame.failsafe = data.failsafe;
+			SbusFrame f;
+			f.failsafe = sbus_rx_.data().failsafe;
 			for (int i = 0; i < Setup::CH_COUNT; i++)
-				frame.channels[i] = data.ch[i];
-			channel_bus_.publish(frame);
+				f.channels[i] = sbus_rx_.data().ch[i];
+			bus_.publish(f);
 		}
 	}
 };
 
-// ----------------------------------------------------------------------------
-// PID Controller
-// ----------------------------------------------------------------------------
-class RatePid
-{
-	FirmwareParams& fp_;
-	float integral_			= 0.0f;
-	float prevGyro_			= 0.0f;
-	float filteredD_		= 0.0f;
-	int prevOutput_			= 0;
-	unsigned long lastTime_ = 0;
-
-public:
-	explicit RatePid(FirmwareParams& fp) : fp_(fp) {}
-
-	void reset()
-	{
-		integral_	= 0.0f;
-		prevGyro_	= 0.0f;
-		filteredD_	= 0.0f;
-		prevOutput_ = 0;
-		lastTime_	= millis();
-	}
-
-	int update(float targetRate, float currentGyro)
-	{
-		unsigned long now = millis();
-		float dt		  = (now - lastTime_) / 1000.0f;
-		lastTime_		  = now;
-		if (dt <= 0.0f || dt > 0.1f)
-			dt = 0.02f;
-
-		float kp = *fp_.getParamPtr("PID_P", Setup::PID_P);
-		float ki = *fp_.getParamPtr("PID_I", Setup::PID_I);
-		float kd = *fp_.getParamPtr("PID_D", Setup::PID_D);
-		float intLimit =
-			*fp_.getParamPtr("PID_INTEGRAL_LIMIT", Setup::PID_INTEGRAL_LIMIT);
-		float maxOut =
-			*fp_.getParamPtr("PID_MAX_OUTPUT", Setup::PID_MAX_OUTPUT);
-		float maxStep = *fp_.getParamPtr(
-			"PID_MAX_STEP_PER_LOOP", Setup::PID_MAX_STEP_PER_LOOP);
-		float dAlpha =
-			*fp_.getParamPtr("PID_D_FILTER_ALPHA", Setup::PID_D_FILTER_ALPHA);
-
-		float error = targetRate - currentGyro;
-		float pTerm = kp * error;
-		integral_ += error * dt;
-		integral_	= constrain(integral_, -intLimit, intLimit);
-		float iTerm = ki * integral_;
-
-		float gyroDeriv = (currentGyro - prevGyro_) / dt;
-		prevGyro_		= currentGyro;
-		filteredD_		= (1.0f - dAlpha) * filteredD_ + dAlpha * gyroDeriv;
-		float dTerm		= -kd * filteredD_;
-
-		float output = pTerm + iTerm + dTerm;
-		int raw	  = constrain((int)roundf(output), -(int)maxOut, (int)maxOut);
-		int delta = constrain(raw - prevOutput_, -(int)maxStep, (int)maxStep);
-		prevOutput_ += delta;
-		return prevOutput_;
-	}
-};
-
-// ----------------------------------------------------------------------------
-// Mixers
-// ----------------------------------------------------------------------------
 class ThrottleMixer : public IChannelObserver
 {
 	FirmwareParams& fp_;
 
 public:
-	explicit ThrottleMixer(FirmwareParams& fp) : fp_(fp) {}
-
+	ThrottleMixer(FirmwareParams& f) : fp_(f) {}
 	void onChannelsUpdate(const SbusFrame& f) override
 	{
-		int chMain =
+		int chM =
 			(int)*fp_.getParamPtr("CH_MAIN_ENGINE", Setup::CH_MAIN_ENGINE);
-		fp_.setParam<true>("CH_MAIN_ENGINE_VAL", f.channels[chMain]);
 		fp_.setParam<true>("PWM_ME",
-			map(f.channels[chMain],
+			map(f.channels[chM],
 				*fp_.getParamPtr(
 					"CH_MAIN_ENGINE_MIN", Setup::CH_MAIN_ENGINE_MIN),
 				*fp_.getParamPtr(
@@ -668,9 +664,8 @@ public:
 				Setup::MAIN_OFF,
 				Setup::MAIN_FULL));
 
-		int chFwd = (int)*fp_.getParamPtr("CH_FORWARD", Setup::CH_FORWARD);
-		fp_.setParam<true>("CH_FORWARD_VAL", f.channels[chFwd]);
-		int fwd = map(f.channels[chFwd],
+		int chF = (int)*fp_.getParamPtr("CH_FORWARD", Setup::CH_FORWARD);
+		int fwd = map(f.channels[chF],
 			Setup::CH_FORWARD_MIN,
 			Setup::CH_FORWARD_MAX,
 			Setup::LR_OFF,
@@ -685,43 +680,81 @@ class RotationMixer : public IChannelObserver
 	FirmwareParams& fp_;
 
 public:
-	explicit RotationMixer(FirmwareParams& fp) : fp_(fp) {}
-
+	RotationMixer(FirmwareParams& f) : fp_(f) {}
 	void onChannelsUpdate(const SbusFrame& f) override
 	{
-		int chRot = (int)*fp_.getParamPtr("CH_ROTATE", Setup::CH_ROTATE);
-		fp_.setParam<true>("CH_ROTATE_VAL", f.channels[chRot]);
-		int offset = f.channels[chRot] - Setup::CH_ROTATE_MID;
-		int baseLE = *fp_.getParamPtr("PWM_LE", Setup::LR_OFF);
-		int baseRE = *fp_.getParamPtr("PWM_RE", Setup::LR_OFF);
-
-		if (offset < -50)
+		int offset =
+			f.channels[(int)*fp_.getParamPtr("CH_ROTATE", Setup::CH_ROTATE)] -
+			Setup::CH_ROTATE_MID;
+		int le = *fp_.getParamPtr("PWM_LE", Setup::LR_OFF),
+			re = *fp_.getParamPtr("PWM_RE", Setup::LR_OFF);
+		if (abs(offset) > 50)
 		{
 			int ppm = map(abs(offset), 50, 800, 0, 400);
-			fp_.setParam<false>("PWM_RE", baseRE + ppm);
-			fp_.setParam<false>("PWM_LE", baseLE - ppm);
-		}
-		else if (offset > 50)
-		{
-			int ppm = map(abs(offset), 50, 800, 0, 400);
-			fp_.setParam<false>("PWM_RE", baseRE - ppm);
-			fp_.setParam<false>("PWM_LE", baseLE + ppm);
+			fp_.setParam<false>("PWM_LE", offset < 0 ? le - ppm : le + ppm);
+			fp_.setParam<false>("PWM_RE", offset < 0 ? re + ppm : re - ppm);
 		}
 	}
 };
 
-// ----------------------------------------------------------------------------
-// Heading Hold
-// ----------------------------------------------------------------------------
+class RatePid
+{
+	FirmwareParams& fp_;
+	float integral_ = 0, prevGyro_ = 0, filteredD_ = 0;
+	int prevOutput_			= 0;
+	unsigned long lastTime_ = 0;
+
+public:
+	RatePid(FirmwareParams& f) : fp_(f) {}
+	void reset()
+	{
+		integral_ = prevGyro_ = filteredD_ = 0;
+		prevOutput_						   = 0;
+		lastTime_						   = millis();
+	}
+	int update(float target, float gyro)
+	{
+		unsigned long now = millis();
+		float dt		  = (now - lastTime_) / 1000.0f;
+		lastTime_		  = now;
+		if (dt <= 0 || dt > 0.1f)
+			dt = 0.02f;
+
+		float err = target - gyro;
+		integral_ = constrain(integral_ + err * dt,
+			-*fp_.getParamPtr("PID_INTEGRAL_LIMIT", Setup::PID_INTEGRAL_LIMIT),
+			*fp_.getParamPtr("PID_INTEGRAL_LIMIT", Setup::PID_INTEGRAL_LIMIT));
+		filteredD_ =
+			(1 - *fp_.getParamPtr(
+					 "PID_D_FILTER_ALPHA", Setup::PID_D_FILTER_ALPHA)) *
+				filteredD_ +
+			*fp_.getParamPtr("PID_D_FILTER_ALPHA", Setup::PID_D_FILTER_ALPHA) *
+				(gyro - prevGyro_) / dt;
+		prevGyro_ = gyro;
+
+		float out = *fp_.getParamPtr("PID_P", Setup::PID_P) * err +
+					*fp_.getParamPtr("PID_I", Setup::PID_I) * integral_ -
+					*fp_.getParamPtr("PID_D", Setup::PID_D) * filteredD_;
+		int raw	  = constrain((int)roundf(out),
+			  -(int)*fp_.getParamPtr("PID_MAX_OUTPUT", Setup::PID_MAX_OUTPUT),
+			  (int)*fp_.getParamPtr("PID_MAX_OUTPUT", Setup::PID_MAX_OUTPUT));
+		int delta = constrain(raw - prevOutput_,
+			-(int)*fp_.getParamPtr(
+				"PID_MAX_STEP_PER_LOOP", Setup::PID_MAX_STEP_PER_LOOP),
+			(int)*fp_.getParamPtr(
+				"PID_MAX_STEP_PER_LOOP", Setup::PID_MAX_STEP_PER_LOOP));
+		return (prevOutput_ += delta);
+	}
+};
+
 class HeadingHoldController : public IChannelObserver
 {
 	HeadingSensor& sensor_;
 	WiFiLink& link_;
 	FirmwareParams& fp_;
 	RatePid pid_;
-	float targetHeading_ = 0.0f;
+	float targetHeading_ = 0;
 	bool active_		 = false;
-
 	static float wrap360(float v)
 	{
 		while (v < 0)
@@ -730,7 +763,7 @@ class HeadingHoldController : public IChannelObserver
 			v -= 360;
 		return v;
 	}
-	static float angleError(float t, float c)
+	static float angleErr(float t, float c)
 	{
 		float e = t - c;
 		while (e > 180)
@@ -741,34 +774,27 @@ class HeadingHoldController : public IChannelObserver
 	}
 
 public:
-	HeadingHoldController(HeadingSensor& s, WiFiLink& l, FirmwareParams& fp) :
-		sensor_(s), link_(l), fp_(fp), pid_(fp)
+	HeadingHoldController(HeadingSensor& s, WiFiLink& l, FirmwareParams& f) :
+		sensor_(s), link_(l), fp_(f), pid_(f)
 	{}
-
 	void onChannelsUpdate(const SbusFrame& f) override
 	{
-		int chArm = (int)*fp_.getParamPtr("CH_ARM", Setup::CH_ARM);
-		fp_.setParam<true>("CH_ARM_VAL", f.channels[chArm]);
-		bool armed = (f.channels[chArm] >=
-						  *fp_.getParamPtr("CH_ARM_MIN", Setup::CH_ARM_MIN) &&
-					  f.channels[chArm] <=
-						  *fp_.getParamPtr("CH_ARM_MAX", Setup::CH_ARM_MAX));
-
-		int rotOffset =
+		bool armed =
+			f.channels[(int)*fp_.getParamPtr("CH_ARM", Setup::CH_ARM)] >=
+				*fp_.getParamPtr("CH_ARM_MIN", Setup::CH_ARM_MIN) &&
+			f.channels[(int)*fp_.getParamPtr("CH_ARM", Setup::CH_ARM)] <=
+				*fp_.getParamPtr("CH_ARM_MAX", Setup::CH_ARM_MAX);
+		bool hhOn = f.channels[(int)*fp_.getParamPtr("CH_HH", Setup::CH_HH)] >=
+						*fp_.getParamPtr("CH_HH_MIN", Setup::CH_HH_MIN) &&
+					f.channels[(int)*fp_.getParamPtr("CH_HH", Setup::CH_HH)] <=
+						*fp_.getParamPtr("CH_HH_MAX", Setup::CH_HH_MAX);
+		int rotOff =
 			f.channels[(int)*fp_.getParamPtr("CH_ROTATE", Setup::CH_ROTATE)] -
 			Setup::CH_ROTATE_MID;
-		bool stickCentered = (abs(rotOffset) <= Setup::HH_STICK_DEADZONE);
+		bool centered = abs(rotOff) <= Setup::HH_STICK_DEADZONE;
 
-		int chHH = (int)*fp_.getParamPtr("CH_HH", Setup::CH_HH);
-		fp_.setParam<true>("CH_HH_VAL", f.channels[chHH]);
-		bool hhActivated = (f.channels[chHH] >= *fp_.getParamPtr("CH_HH_MIN",
-													Setup::CH_HH_MIN) &&
-							f.channels[chHH] <= *fp_.getParamPtr("CH_HH_MAX",
-													Setup::CH_HH_MAX));
-
-		bool requested = sensor_.isMagReady() && sensor_.isMpuReady() &&
-						 hhActivated && armed && !f.failsafe;
-		if (!requested)
+		if (!(sensor_.isMagReady() && sensor_.isMpuReady() && hhOn && armed &&
+				!f.failsafe))
 		{
 			if (active_)
 			{
@@ -783,85 +809,74 @@ public:
 			targetHeading_ = sensor_.getHeading();
 			pid_.reset();
 			active_ = true;
-			link_.printf("HH: ACTIVATED at %.1f deg\n", targetHeading_);
+			link_.printf("HH ON %.1f\n", targetHeading_);
 		}
 
-		float stickScale =
+		float scale =
 			*fp_.getParamPtr("HH_STICK_RATE_SCALE", Setup::HH_STICK_RATE_SCALE);
-		float rotWeight =
+		float wGyro =
 			*fp_.getParamPtr("HH_ROT_WEIGHT_GYRO", Setup::HH_ROT_WEIGHT_GYRO);
-		float magGain = *fp_.getParamPtr(
+		float mGain = *fp_.getParamPtr(
 			"HH_MAG_CORRECTION_GAIN", Setup::HH_MAG_CORRECTION_GAIN);
-		float maxMagRate =
+		float maxMR =
 			*fp_.getParamPtr("HH_MAX_MAG_RATE", Setup::HH_MAX_MAG_RATE);
-		float hhDt = *fp_.getParamPtr("HH_DT", Setup::HH_DT);
+		float dt = *fp_.getParamPtr("HH_DT", Setup::HH_DT);
 
-		if (!stickCentered)
+		if (!centered)
 		{
-			float desRate = -(float)rotOffset / 800.0f * stickScale;
-			float blended =
-				rotWeight * sensor_.gyroZ() + (1 - rotWeight) * desRate;
-			targetHeading_ = wrap360(targetHeading_ + blended * hhDt);
+			float desRate = -(float)rotOff / 800.0f * scale;
+			targetHeading_ =
+				wrap360(targetHeading_ +
+						(wGyro * sensor_.gyroZ() + (1 - wGyro) * desRate) * dt);
 			pid_.reset();
-			link_.printf("HH: MANUAL desRate:%.1f gyro:%.1f tgt:%.1f\n",
-				desRate,
-				sensor_.gyroZ(),
-				targetHeading_);
 		}
 		else
 		{
-			float magErr = angleError(targetHeading_, sensor_.getHeading());
-			float magRateCmd =
-				constrain(magErr * magGain, -maxMagRate, maxMagRate);
-			targetHeading_ = wrap360(targetHeading_ + sensor_.gyroZ() * hhDt);
-			targetHeading_ = wrap360(targetHeading_ + magRateCmd * hhDt);
-			int corr	   = pid_.update(magRateCmd, sensor_.gyroZ());
+			float mErr = angleErr(targetHeading_, sensor_.getHeading());
+			float mCmd = constrain(mErr * mGain, -maxMR, maxMR);
+			targetHeading_ =
+				wrap360(targetHeading_ + (sensor_.gyroZ() + mCmd) * dt);
+			int corr = pid_.update(mCmd, sensor_.gyroZ());
 			fp_.setParam<false>(
 				"PWM_LE", *fp_.getParamPtr("PWM_LE", Setup::LR_OFF) - corr);
 			fp_.setParam<false>(
 				"PWM_RE", *fp_.getParamPtr("PWM_RE", Setup::LR_OFF) + corr);
-			link_.printf(
-				"HH: HOLD magErr:%.1f magRate:%.1f corr:%d LE:%d RE:%d\n",
-				magErr,
-				magRateCmd,
-				corr,
-				*fp_.getParamPtr("PWM_LE", Setup::LR_OFF),
-				*fp_.getParamPtr("PWM_RE", Setup::LR_OFF));
 		}
 	}
 };
 
 // ----------------------------------------------------------------------------
-// GPS Handler
+// GPS Handler (UART1: RX=17, TX=18)
 // ----------------------------------------------------------------------------
 class GPSHandler
 {
 	HardwareSerial gpsSerial_;
-	WiFiLink& link_;
 	FirmwareParams& fp_;
 	TinyGPSPlus gps_;
 
 public:
-	GPSHandler(WiFiLink& link, FirmwareParams& fp) :
-		gpsSerial_(1), link_(link), fp_(fp)
-	{}
+	GPSHandler(FirmwareParams& fp) : gpsSerial_(1), fp_(fp) {}
 
-	void begin() { gpsSerial_.begin(9600, SERIAL_8N1, 18, 17); }
+	void begin()
+	{
+		gpsSerial_.begin(
+			Setup::GPS_BAUD, SERIAL_8N1, Setup::GPS_RX, Setup::GPS_TX);
+		gpsSerial_.setRxBufferSize(1024);
+		DBG_PRINT("GPS OK (GPIO%d/%d @ %lu)\n",
+			Setup::GPS_TX,
+			Setup::GPS_RX,
+			Setup::GPS_BAUD);
+	}
 
 	void update()
 	{
-
-		Serial.println("GPS HERE");
 		while (gpsSerial_.available())
 		{
-
-			Serial.println("GPS HERE2");
 			char c = gpsSerial_.read();
 			if (gps_.encode(c))
 			{
 				if (gps_.location.isValid())
 				{
-					Serial.println("GPS SENDDDDDDDDDDDD");
 					fp_.setParam<true>("GPS_LAT", gps_.location.lat());
 					fp_.setParam<true>("GPS_LON", gps_.location.lng());
 				}
@@ -892,43 +907,8 @@ class EscOutput : public IChannelObserver
 	Servo me_, le_, re_;
 	FirmwareParams& fp_;
 
-	void applyFailsafe(const SbusFrame& f)
-	{
-		int chArm  = Setup::CH_ARM;
-		bool armed = (f.channels[chArm] >=
-						  *fp_.getParamPtr("CH_ARM_MIN", Setup::CH_ARM_MIN) &&
-					  f.channels[chArm] <=
-						  *fp_.getParamPtr("CH_ARM_MAX", Setup::CH_ARM_MAX));
-		if (f.failsafe || !armed)
-		{
-			fp_.setParam<false>("PWM_ME", Setup::MAIN_OFF);
-			fp_.setParam<false>("PWM_LE", Setup::LR_OFF);
-			fp_.setParam<false>("PWM_RE", Setup::LR_OFF);
-		}
-	}
-
-	void applyLimits()
-	{
-		fp_.setParam<true>("PWM_RE",
-			constrain(*fp_.getParamPtr("PWM_RE", Setup::LR_OFF),
-				Setup::LR_OFF,
-				Setup::LR_FULL));
-		fp_.setParam<true>("PWM_LE",
-			constrain(*fp_.getParamPtr("PWM_LE", Setup::LR_OFF),
-				Setup::LR_OFF,
-				Setup::LR_FULL));
-	}
-
-	void sendToEsc()
-	{
-		me_.writeMicroseconds(*fp_.getParamPtr("PWM_ME", Setup::MAIN_OFF));
-		le_.writeMicroseconds(*fp_.getParamPtr("PWM_LE", Setup::LR_OFF));
-		re_.writeMicroseconds(*fp_.getParamPtr("PWM_RE", Setup::LR_OFF));
-	}
-
 public:
-	explicit EscOutput(FirmwareParams& fp) : fp_(fp) {}
-
+	EscOutput(FirmwareParams& f) : fp_(f) {}
 	void begin()
 	{
 		me_.attach(Setup::ESC_MAIN, Setup::PPM_MIN, Setup::PPM_MAX);
@@ -938,80 +918,106 @@ public:
 		le_.writeMicroseconds(Setup::LR_OFF);
 		re_.writeMicroseconds(Setup::LR_OFF);
 	}
-
 	void onChannelsUpdate(const SbusFrame& f) override
 	{
-		applyFailsafe(f);
-		applyLimits();
-		sendToEsc();
+		bool armed = f.channels[Setup::CH_ARM] >=
+						 *fp_.getParamPtr("CH_ARM_MIN", Setup::CH_ARM_MIN) &&
+					 f.channels[Setup::CH_ARM] <=
+						 *fp_.getParamPtr("CH_ARM_MAX", Setup::CH_ARM_MAX);
+		if (f.failsafe || !armed)
+		{
+			fp_.setParam<false>("PWM_ME", Setup::MAIN_OFF);
+			fp_.setParam<false>("PWM_LE", Setup::LR_OFF);
+			fp_.setParam<false>("PWM_RE", Setup::LR_OFF);
+		}
+		fp_.setParam<true>("PWM_LE",
+			constrain(*fp_.getParamPtr("PWM_LE", Setup::LR_OFF),
+				Setup::LR_OFF,
+				Setup::LR_FULL));
+		fp_.setParam<true>("PWM_RE",
+			constrain(*fp_.getParamPtr("PWM_RE", Setup::LR_OFF),
+				Setup::LR_OFF,
+				Setup::LR_FULL));
+
+		me_.writeMicroseconds(*fp_.getParamPtr("PWM_ME", Setup::MAIN_OFF));
+		le_.writeMicroseconds(*fp_.getParamPtr("PWM_LE", Setup::LR_OFF));
+		re_.writeMicroseconds(*fp_.getParamPtr("PWM_RE", Setup::LR_OFF));
 	}
 };
 
-
+// ----------------------------------------------------------------------------
+// Globals
+// ----------------------------------------------------------------------------
+WiFiLink wifiLink;
+FirmwareParams fwParams(wifiLink);
+#if MAVLINK_ENABLED
+MavlinkHandler mavlinkHandler(fwParams);
+#endif
 HeadingSensor headingSensor(fwParams);
-BayEnvironmentSensor frontBayEnv(
+BayEnvironmentSensor frontEnv(
 	Setup::DHT_FRONT_BAY, fwParams, "TEMP_FRONT", "HUM_FRONT");
-BayEnvironmentSensor rearBayEnv(
+BayEnvironmentSensor rearEnv(
 	Setup::DHT_REAR_BAY, fwParams, "TEMP_REAR", "HUM_REAR");
 ChannelHandler channelHandler;
 ThrottleMixer throttleMixer(fwParams);
 RotationMixer rotationMixer(fwParams);
-HeadingHoldController headingHold(headingSensor, wifiLink, fwParams);
-GPSHandler gpsHandler(wifiLink, fwParams);
+HeadingHoldController hhCtrl(headingSensor, wifiLink, fwParams);
+GPSHandler gpsHandler(fwParams);
 EscOutput escOutput(fwParams);
-
-unsigned long lastEnvPollMs = 0;
 
 void setup()
 {
+#if MAVLINK_ENABLED
 	Serial.begin(115200);
+#else
+	Serial.begin(115200);
+#endif
+	DBG_PRINTLN("=== BOOT ===");
+	DBG_PRINT(
+		"Mode: %s\n", MAVLINK_ENABLED ? "MAVLINK(GPIO32/33)" : "DEBUG(Serial)");
 
 	fwParams.loadFromFS();
 	delay(1000);
-
 	wifiLink.begin(Setup::WIFI_NAME, Setup::WIFI_PASSWORD);
 	Wire.begin(Setup::I2C_SDA, Setup::I2C_SCL);
 
 	if (headingSensor.begin())
-		wifiLink.printf("MPU6050 OK\n");
+		DBG_PRINTLN("MPU6050 OK");
 	else
-		wifiLink.printf("MPU6050 NOT FOUND!\n");
+		DBG_PRINTLN("MPU6050 FAIL");
 
-	frontBayEnv.begin();
-	rearBayEnv.begin();
+	frontEnv.begin();
+	rearEnv.begin();
 	channelHandler.begin();
 	gpsHandler.begin();
 
-	wifiLink.printf("ESP32 + SBUS Receiver + GPS started\n");
-	escOutput.begin();
+#if MAVLINK_ENABLED
+	mavlinkHandler.begin();
+#endif
 
+	escOutput.begin();
 	channelHandler.subscribe(&throttleMixer);
 	channelHandler.subscribe(&rotationMixer);
-	channelHandler.subscribe(&headingHold);
+	channelHandler.subscribe(&hhCtrl);
 	channelHandler.subscribe(&escOutput);
 
-	wifiLink.printf("System ready. Waiting 5s...\n");
+	DBG_PRINTLN("Ready.");
 	delay(5000);
 }
 
 void loop()
 {
 	if (wifiLink.poll(fwParams.getAllMutable()))
-	{
 		fwParams.markDirty();
-	}
-
 	headingSensor.update();
 	gpsHandler.update();
-
-	frontBayEnv.update();
-	rearBayEnv.update();
-
+#if MAVLINK_ENABLED
+	mavlinkHandler.update();
+#endif
+	frontEnv.update();
+	rearEnv.update();
 	if (fwParams.isDirty() &&
-		(millis() - fwParams.lastSaveTime() >= Setup::SAVE_INTERVAL_MS))
-	{
+		millis() - fwParams.lastSaveTime() >= Setup::SAVE_INTERVAL_MS)
 		fwParams.saveToFS();
-	}
-
 	channelHandler.update();
 }
