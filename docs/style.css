@@ -8,6 +8,7 @@
 body {
 	background-color: #000000;
 	color: #ffffff;
+	overflow-x: hidden;
 }
 
 section {
@@ -51,8 +52,9 @@ section p {
 }
 
 .content-img {
-    width: 400px;
-    height: 400px;
+    width: min(400px, 100%);
+    height: auto;
+    max-height: 400px;
     object-fit: contain;
 	align-self: center;
 }
@@ -183,6 +185,30 @@ p {
 }
 
 @media (max-width: 700px) {
+    section {
+        padding: 90px 20px 30px;
+    }
+
+    section p {
+        width: 100%;
+        font-size: 18px;
+    }
+
+    nav {
+        padding: 12px 8px;
+    }
+
+    nav ul {
+        width: calc(100% - 70px);
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        padding: 6px 5px;
+        font-size: 13px;
+    }
+
     .language-switch {
         right: 10px;
         top: 12px;
@@ -266,11 +292,11 @@ nav ul {
     list-style: none;
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: clamp(8px, 2vw, 40px);
     
     flex-direction: row; 
     align-items: center; 
-    width: auto;
+    width: calc(100% - 150px);
     max-width: 100%;
     margin: 0;
     padding: 0;
@@ -279,10 +305,10 @@ nav ul {
 nav a {
 	color: #ff8c00;
 	text-decoration: none;
-	font-size: 18px;
+	font-size: clamp(14px, 1.4vw, 18px);
 	font-weight: bold;
 	transition: all 0.3s ease;
-	padding: 10px 20px;
+	padding: 10px clamp(6px, 1vw, 20px);
 	border-radius: 5px;
 }
 
