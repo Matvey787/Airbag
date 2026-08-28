@@ -5,3 +5,4 @@ map/central-fed-district-260818.mbtiles
 map/central-fed-district-260818.osm.pbf
 build/
 packaging/
+*.AppImage
